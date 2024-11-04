@@ -42,7 +42,7 @@ class Speedometer(QWidget):
 
         painter.setFont(QFont("Arial", 12))
         painter.setPen(QColor(0, 0, 0))
-        painter.drawText(int(text_x), int(text_y), f"{self.speed} dilay <3 metin")
+        painter.drawText(int(text_x), int(text_y), f"{self.speed} km/h")
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
