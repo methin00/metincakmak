@@ -1,0 +1,63 @@
+import sys
+import math
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtGui import QPainter, QPolygon, QColor, QFont
+from PyQt5.QtCore import Qt, QPoint, QTimer
+
+class Speedometer(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Speedometer")
+        self.setGeometry(100, 100, 600, 600)
+        self.speed = 0
+        self.target_speed = 0
+        self.max_speed = 100
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_speed)
+        self.timer.start(30)
+        self.show()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        center_x, center_y = self.width() // 2, self.height() // 2
+        radius = 100
+        painter.setBrush(QColor(200, 200, 200))
+        painter.drawEllipse(center_x - radius, center_y - radius, 2 * radius, 2 * radius)
+
+        angle = -180 + (self.speed / self.max_speed) * 180
+        painter.save()
+        painter.translate(center_x, center_y)
+        painter.rotate(angle)
+
+        painter.setBrush(QColor(255, 0, 0))
+        polygon = QPolygon([QPoint(0, -5), QPoint(100, 0), QPoint(0, 5)])
+        painter.drawPolygon(polygon)
+        painter.restore()
+
+        radian_angle = math.radians(angle)
+        text_x = center_x + (radius + 20) * math.cos(radian_angle)
+        text_y = center_y + (radius + 20) * math.sin(radian_angle)
+
+        painter.setFont(QFont("Arial", 12))
+        painter.setPen(QColor(0, 0, 0))
+        painter.drawText(int(text_x), int(text_y), f"{self.speed} dilay <3 metin")
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Up:
+            self.target_speed = min(self.max_speed, self.target_speed + 10)
+        elif event.key() == Qt.Key_Down:
+            self.target_speed = max(0, self.target_speed - 10)
+
+    def update_speed(self):
+        if self.speed < self.target_speed:
+            self.speed += 1
+        elif self.speed > self.target_speed:
+            self.speed -= 1
+        self.update()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    speedometer = Speedometer()
+    sys.exit(app.exec_())
